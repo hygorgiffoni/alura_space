@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from galeria.models import Fotografia
+from apps.galeria.models import Fotografia
 from django.contrib import messages
+from apps.galeria.forms import FotografiaForms
 
 def index(request):
     '''Função para imprimir na view o código html'''
@@ -28,3 +29,25 @@ def buscar(request):
             fotografias = fotografias.filter(nome__icontains=nome_buscar)
 
     return render(request, 'galeria/buscar.html', {'cards': fotografias})
+
+def nova_imagem(request):
+    '''Função para adicionar uma nova imagem na galeria'''
+    if not request.user.is_authenticated:
+        messages.error(request, 'Usuário não logado')
+        return redirect('login')
+
+    form = FotografiaForms()
+    if request.method == 'POST':
+        form = FotografiaForms(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Nova fotografia cadastrada!')
+            return redirect('index')
+
+    return render(request, 'galeria/nova_imagem.html', {'form':form})
+
+def editar_imagem(request):
+    '''Função para editar uma nova imagem da galeria'''
+
+def deletar_imagem(request):
+    '''Função para deletar uma nova imagem da galeria'''
